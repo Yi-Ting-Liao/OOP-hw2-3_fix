@@ -1697,9 +1697,15 @@ map<string,link::link_generator*> link::link_generator::prototypes;
 map<pair<unsigned int,unsigned int>, link*> link::id_id_link_table;
 
 void node::add_phy_neighbor (unsigned int _id, const string &link_type){
-    if (id == _id) {return;} // if the two nodes are the same...
-    if (id_node_table.find(_id)==id_node_table.end()) {return;} // if this node does not exist
-    if (phy_neighbors.find(_id)!=phy_neighbors.end()) {return;} // if this neighbor has been added
+    if (id == _id) {
+        return; // if the two nodes are the same...
+    }
+    if (id_node_table.find(_id)==id_node_table.end()) {
+        return; // if this node does not exist
+    }
+    if (phy_neighbors.find(_id)!=phy_neighbors.end()) {
+        return; // if this neighbor has been added
+    }
     phy_neighbors[_id] = true;
 
     link::link_generator::generate(link_type,id,_id);
@@ -1838,13 +1844,17 @@ void node::send_handler(packet *p){
 }
 
 void node::send(packet *p){ // this function is called by event; not for the user
-    if (p == nullptr) {return;}
+    if (p == nullptr) {
+        return;
+    }
 
     unsigned int _nexID = p->get_header()->get_nex_ID();
     for ( map<unsigned int,bool>::iterator it = phy_neighbors.begin(); it != phy_neighbors.end(); it ++) {
         unsigned int nb_id = it->first; // neighbor id
 
-        if (nb_id != _nexID && BROCAST_ID != _nexID) {continue;} // this neighbor will not receive the packet
+        if (nb_id != _nexID && BROCAST_ID != _nexID) {
+            continue; // this neighbor will not receive the packet
+        }
 
         unsigned int trigger_time = event::getCurTime() + link::id_id_to_link(id, nb_id)->getLatency() ; // we simply assume that the delay is fixed
         // cout << "node " << id << " send to node " <<  nb_id << '\n';
@@ -1871,7 +1881,9 @@ void IoT_device::recv_handler (packet *p){
     // node 0 broadcasts its message to every node and every node relays the packet "only once" and increases its counter
     // the variable hi is used to examine whether the packet has been received by this node before
     // you can remove the variable hi and create your own routing table in class IoT_device
-    if (p == nullptr) {return ;}
+    if (p == nullptr) {
+        return ;
+    }
 
     if (p->type() == "IoT_ctrl_packet" && !hi ) { // the device receives a packet from the sink
         IoT_ctrl_packet *p3 = nullptr;
